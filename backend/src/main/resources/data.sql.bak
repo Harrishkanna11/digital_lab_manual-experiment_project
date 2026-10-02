@@ -1,0 +1,38 @@
+-- ============================================================
+-- DIGITAL LAB MANUAL AND EXPERIMENT MANAGEMENT SYSTEM (DLME)
+-- Initial Seed Data (Reference / Manual Setup)
+-- Note: DataInitializer.java seeds this automatically on first startup.
+-- ============================================================
+
+-- Passwords below are BCrypt hashes of 'password123'
+-- ($2a$10$wJtK1pS59uYm8sXjJ6N1k.f8WwRjQdZ4h9K9I9L9O9P9Q9R9S9T9U)
+
+-- Sample Users
+INSERT INTO users (email, password, full_name, role, department, active, created_at, updated_at)
+VALUES 
+('faculty@digitallab.edu', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a', 'Dr. Alan Turing', 'FACULTY', 'Computer Science and Engineering', true, NOW(), NOW()),
+('student@digitallab.edu', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a', 'Ada Lovelace', 'STUDENT', 'Computer Science and Engineering', true, NOW(), NOW())
+ON CONFLICT (email) DO NOTHING;
+
+-- Sample Faculty
+INSERT INTO faculty (user_id, faculty_id, designation, created_at, updated_at)
+SELECT u.id, 'FAC001', 'Professor & HOD', NOW(), NOW()
+FROM users u WHERE u.email = 'faculty@digitallab.edu'
+ON CONFLICT DO NOTHING;
+
+-- Sample Student
+INSERT INTO students (user_id, register_number, year, section, created_at, updated_at)
+SELECT u.id, '21CS101', 3, 'A', NOW(), NOW()
+FROM users u WHERE u.email = 'student@digitallab.edu'
+ON CONFLICT DO NOTHING;
+
+-- Sample Subjects
+INSERT INTO subjects (subject_name, course_code, department, year, semester, academic_year, faculty_id, created_at, updated_at)
+SELECT 'Data Structures and Algorithms Lab', 'CS301', 'Computer Science and Engineering', 3, 5, '2024-2025', f.id, NOW(), NOW()
+FROM faculty f JOIN users u ON f.user_id = u.id WHERE u.email = 'faculty@digitallab.edu'
+ON CONFLICT (course_code) DO NOTHING;
+
+INSERT INTO subjects (subject_name, course_code, department, year, semester, academic_year, faculty_id, created_at, updated_at)
+SELECT 'Database Management Systems Lab', 'CS302', 'Computer Science and Engineering', 3, 5, '2024-2025', f.id, NOW(), NOW()
+FROM faculty f JOIN users u ON f.user_id = u.id WHERE u.email = 'faculty@digitallab.edu'
+ON CONFLICT (course_code) DO NOTHING;
