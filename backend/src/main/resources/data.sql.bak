@@ -10,8 +10,8 @@
 -- Sample Users
 INSERT INTO users (email, password, full_name, role, department, active, created_at, updated_at)
 VALUES 
-('faculty@digitallab.edu', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a', 'Dr. Alan Turing', 'FACULTY', 'Computer Science and Engineering', true, NOW(), NOW()),
-('student@digitallab.edu', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a', 'Ada Lovelace', 'STUDENT', 'Computer Science and Engineering', true, NOW(), NOW())
+('faculty@digitallab.edu', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a', 'Faculty Instructor', 'FACULTY', 'Computer Science and Engineering', true, NOW(), NOW()),
+('student@digitallab.edu', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a', 'Student User', 'STUDENT', 'Computer Science and Engineering', true, NOW(), NOW())
 ON CONFLICT (email) DO NOTHING;
 
 -- Sample Faculty

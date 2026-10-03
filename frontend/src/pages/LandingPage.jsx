@@ -128,14 +128,14 @@ export default function LandingPage() {
                 className="btn btn-demo-student"
                 onClick={() => handleQuickDemo('student@digitallab.edu', 'password123', 'STUDENT')}
               >
-                🎓 Student Portal (Ada)
+                🎓 Student Portal
               </button>
               <button
                 type="button"
                 className="btn btn-demo-faculty"
                 onClick={() => handleQuickDemo('faculty@digitallab.edu', 'password123', 'FACULTY')}
               >
-                👨‍🏫 Faculty Portal (Alan)
+                👨‍🏫 Faculty Portal
               </button>
             </div>
           </div>

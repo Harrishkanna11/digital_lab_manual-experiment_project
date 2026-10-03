@@ -34,18 +34,30 @@ public class AttendanceService {
         Subject subject = subjectRepository.findById(request.getSubjectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Subject", request.getSubjectId()));
 
-        Attendance attendance = Attendance.builder()
-                .student(student)
-                .subject(subject)
-                .date(request.getDate())
-                .status(request.getStatus())
-                .markedBy(faculty)
-                .build();
+        java.util.Optional<Attendance> existingOpt = attendanceRepository.findByStudentIdAndSubjectIdAndDate(
+                student.getId(), subject.getId(), request.getDate());
+
+        Attendance attendance;
+        if (existingOpt.isPresent()) {
+            attendance = existingOpt.get();
+            attendance.setStatus(request.getStatus());
+            attendance.setMarkedBy(faculty);
+        } else {
+            attendance = Attendance.builder()
+                    .student(student)
+                    .subject(subject)
+                    .date(request.getDate())
+                    .status(request.getStatus())
+                    .markedBy(faculty)
+                    .build();
+        }
 
         if (request.getExperimentId() != null) {
             Experiment experiment = experimentRepository.findById(request.getExperimentId())
                     .orElseThrow(() -> new ResourceNotFoundException("Experiment", request.getExperimentId()));
             attendance.setExperiment(experiment);
+        } else {
+            attendance.setExperiment(null);
         }
 
         return toResponse(attendanceRepository.save(attendance));
@@ -63,7 +75,17 @@ public class AttendanceService {
 
     @Transactional(readOnly = true)
     public List<AttendanceResponse> getBySubject(Long subjectId) {
-        return attendanceRepository.findBySubjectId(subjectId)
+        return attendanceRepository.findBySubjectIdOrdered(subjectId)
+                .stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<AttendanceResponse> getFacultyAttendance(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        Faculty faculty = facultyRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Faculty not found"));
+        return attendanceRepository.findForFaculty(faculty.getId())
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
@@ -91,6 +113,11 @@ public class AttendanceService {
         Attendance attendance = attendanceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Attendance", id));
         attendance.setStatus(request.getStatus());
+        if (request.getExperimentId() != null) {
+            Experiment experiment = experimentRepository.findById(request.getExperimentId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Experiment", request.getExperimentId()));
+            attendance.setExperiment(experiment);
+        }
         return toResponse(attendanceRepository.save(attendance));
     }
 

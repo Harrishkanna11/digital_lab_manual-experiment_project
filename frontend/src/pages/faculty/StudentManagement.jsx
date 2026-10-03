@@ -10,10 +10,10 @@ export default function StudentManagement() {
     studentService.getAll().then(res => setStudents(res.data)).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-  const filtered = students.filter(s =>
-    s.fullName.toLowerCase().includes(search.toLowerCase()) ||
-    s.registerNumber.toLowerCase().includes(search.toLowerCase()) ||
-    s.email.toLowerCase().includes(search.toLowerCase())
+  const filtered = (students || []).filter(s =>
+    (s.fullName || '').toLowerCase().includes((search || '').toLowerCase()) ||
+    (s.registerNumber || '').toLowerCase().includes((search || '').toLowerCase()) ||
+    (s.email || '').toLowerCase().includes((search || '').toLowerCase())
   );
 
   if (loading) return <div className="loading-spinner"><div className="spinner"></div></div>;

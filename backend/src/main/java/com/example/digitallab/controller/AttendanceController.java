@@ -47,6 +47,13 @@ public class AttendanceController {
         return ResponseEntity.ok(attendanceService.getBySubject(subjectId));
     }
 
+    @GetMapping("/faculty")
+    @PreAuthorize("hasRole('FACULTY')")
+    public ResponseEntity<List<AttendanceResponse>> getFacultyAttendance(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(attendanceService.getFacultyAttendance(userDetails.getUsername()));
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('FACULTY')")
     public ResponseEntity<AttendanceResponse> update(

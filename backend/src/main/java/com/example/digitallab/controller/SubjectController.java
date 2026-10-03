@@ -79,7 +79,7 @@ public class SubjectController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{subjectId}/unenroll")
+    @RequestMapping(value = "/{subjectId}/unenroll", method = {RequestMethod.POST, RequestMethod.DELETE})
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Void> unenroll(
             @PathVariable Long subjectId,

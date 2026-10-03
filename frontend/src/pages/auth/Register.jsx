@@ -47,11 +47,11 @@ export default function Register() {
         </div>
 
         {role === 'STUDENT' ? (
-          <form onSubmit={handleStudentRegister}>
-            <div className="form-group"><label>Full Name</label><input className="form-control" placeholder="Enter your full name" value={studentForm.fullName} onChange={e => setStudentForm({...studentForm, fullName: e.target.value})} required /></div>
-            <div className="form-group"><label>Register Number</label><input className="form-control" placeholder="e.g. 21CS101" value={studentForm.registerNumber} onChange={e => setStudentForm({...studentForm, registerNumber: e.target.value})} required /></div>
-            <div className="form-group"><label>Email</label><input type="email" className="form-control" placeholder="student@college.edu" value={studentForm.email} onChange={e => setStudentForm({...studentForm, email: e.target.value})} required /></div>
-            <div className="form-group"><label>Password</label><input type="password" className="form-control" placeholder="Min 6 characters" value={studentForm.password} onChange={e => setStudentForm({...studentForm, password: e.target.value})} required minLength={6} /></div>
+          <form onSubmit={handleStudentRegister} autoComplete="off">
+            <div className="form-group"><label>Full Name</label><input className="form-control" placeholder="Enter your full name" value={studentForm.fullName} onChange={e => setStudentForm({...studentForm, fullName: e.target.value})} autoComplete="off" required /></div>
+            <div className="form-group"><label>Register Number</label><input className="form-control" placeholder="e.g. 21CS101" value={studentForm.registerNumber} onChange={e => setStudentForm({...studentForm, registerNumber: e.target.value})} autoComplete="off" required /></div>
+            <div className="form-group"><label>Email</label><input type="email" className="form-control" placeholder="student@college.edu" value={studentForm.email} onChange={e => setStudentForm({...studentForm, email: e.target.value})} autoComplete="off" required /></div>
+            <div className="form-group"><label>Password</label><input type="password" className="form-control" placeholder="Min 6 characters" value={studentForm.password} onChange={e => setStudentForm({...studentForm, password: e.target.value})} autoComplete="new-password" required minLength={6} /></div>
             <div className="form-row">
               <div className="form-group"><label>Department</label><input className="form-control" placeholder="e.g. CSE" value={studentForm.department} onChange={e => setStudentForm({...studentForm, department: e.target.value})} required /></div>
               <div className="form-group"><label>Year</label><select className="form-control" value={studentForm.year} onChange={e => setStudentForm({...studentForm, year: parseInt(e.target.value)})}><option value={1}>1st Year</option><option value={2}>2nd Year</option><option value={3}>3rd Year</option><option value={4}>4th Year</option></select></div>
@@ -60,11 +60,11 @@ export default function Register() {
             <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 8 }} disabled={loading}>{loading ? 'Registering...' : 'Register as Student'}</button>
           </form>
         ) : (
-          <form onSubmit={handleFacultyRegister}>
-            <div className="form-group"><label>Faculty Name</label><input className="form-control" placeholder="Enter full name" value={facultyForm.fullName} onChange={e => setFacultyForm({...facultyForm, fullName: e.target.value})} required /></div>
-            <div className="form-group"><label>Faculty ID</label><input className="form-control" placeholder="e.g. FAC001" value={facultyForm.facultyId} onChange={e => setFacultyForm({...facultyForm, facultyId: e.target.value})} required /></div>
-            <div className="form-group"><label>Email</label><input type="email" className="form-control" placeholder="faculty@college.edu" value={facultyForm.email} onChange={e => setFacultyForm({...facultyForm, email: e.target.value})} required /></div>
-            <div className="form-group"><label>Password</label><input type="password" className="form-control" placeholder="Min 6 characters" value={facultyForm.password} onChange={e => setFacultyForm({...facultyForm, password: e.target.value})} required minLength={6} /></div>
+          <form onSubmit={handleFacultyRegister} autoComplete="off">
+            <div className="form-group"><label>Faculty Name</label><input className="form-control" placeholder="Enter full name" value={facultyForm.fullName} onChange={e => setFacultyForm({...facultyForm, fullName: e.target.value})} autoComplete="off" required /></div>
+            <div className="form-group"><label>Faculty ID</label><input className="form-control" placeholder="e.g. FAC001" value={facultyForm.facultyId} onChange={e => setFacultyForm({...facultyForm, facultyId: e.target.value})} autoComplete="off" required /></div>
+            <div className="form-group"><label>Email</label><input type="email" className="form-control" placeholder="faculty@college.edu" value={facultyForm.email} onChange={e => setFacultyForm({...facultyForm, email: e.target.value})} autoComplete="off" required /></div>
+            <div className="form-group"><label>Password</label><input type="password" className="form-control" placeholder="Min 6 characters" value={facultyForm.password} onChange={e => setFacultyForm({...facultyForm, password: e.target.value})} autoComplete="new-password" required minLength={6} /></div>
             <div className="form-row">
               <div className="form-group"><label>Department</label><input className="form-control" placeholder="e.g. CSE" value={facultyForm.department} onChange={e => setFacultyForm({...facultyForm, department: e.target.value})} required /></div>
               <div className="form-group"><label>Designation</label><input className="form-control" placeholder="e.g. Associate Professor" value={facultyForm.designation} onChange={e => setFacultyForm({...facultyForm, designation: e.target.value})} required /></div>

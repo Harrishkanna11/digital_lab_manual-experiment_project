@@ -57,10 +57,10 @@ Starts on **http://localhost:5173**. Vite proxies `/api` to the backend.
 
 The backend automatically seeds demo accounts, subjects, lab manuals, and experiments on initial launch:
 
-| Role | Email | Password | Name / Details |
+| Role | Email | Password | Role / Details |
 |---|---|---|---|
-| **Faculty** | `faculty@digitallab.edu` | `password123` | Dr. Alan Turing (HOD, CSE) |
-| **Student** | `student@digitallab.edu` | `password123` | Ada Lovelace (Reg: 21CS101) |
+| **Faculty** | `faculty@digitallab.edu` | `password123` | Faculty Instructor (HOD, CSE) |
+| **Student** | `student@digitallab.edu` | `password123` | Student (Reg: 21CS101) |
 
 ---
 

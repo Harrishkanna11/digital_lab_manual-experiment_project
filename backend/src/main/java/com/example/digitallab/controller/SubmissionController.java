@@ -42,8 +42,10 @@ public class SubmissionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SubmissionResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(submissionService.getById(id));
+    public ResponseEntity<SubmissionResponse> getById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(submissionService.getById(id, userDetails.getUsername()));
     }
 
     @PutMapping("/{id}/review")

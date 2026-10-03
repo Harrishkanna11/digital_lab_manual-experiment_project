@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   studentService,
   submissionService,
   markService,
-  attendanceService
+  attendanceService,
+  subjectService
 } from '../../services/dataService';
+import toast from 'react-hot-toast';
 import {
   ResponsiveContainer,
   BarChart,
@@ -26,23 +28,41 @@ export default function StudentDashboard() {
   const [submissions, setSubmissions] = useState([]);
   const [marks, setMarks] = useState([]);
   const [attendanceSummary, setAttendanceSummary] = useState(null);
+  const [enrolledSubjects, setEnrolledSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadData = useCallback(() => {
     Promise.all([
       studentService.getDashboard().catch(() => ({ data: null })),
       submissionService.getStudentSubmissions().catch(() => ({ data: [] })),
       markService.getStudentMarks().catch(() => ({ data: [] })),
-      attendanceService.getStudentSummary().catch(() => ({ data: null }))
+      attendanceService.getStudentSummary().catch(() => ({ data: null })),
+      subjectService.getForStudent().catch(() => ({ data: [] }))
     ])
-      .then(([dashRes, subRes, markRes, attRes]) => {
+      .then(([dashRes, subRes, markRes, attRes, subjRes]) => {
         setStats(dashRes.data);
         setSubmissions(subRes.data || []);
         setMarks(markRes.data || []);
         setAttendanceSummary(attRes.data);
+        setEnrolledSubjects(subjRes.data || []);
       })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handleUnenroll = async (subjectId, subjectName) => {
+    if (!window.confirm(`Are you sure you want to unenroll from "${subjectName}"?`)) return;
+    try {
+      await subjectService.unenroll(subjectId);
+      toast.success(`Successfully unenrolled from ${subjectName}`);
+      loadData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to unenroll');
+    }
+  };
 
   if (loading) {
     return (
@@ -354,8 +374,8 @@ export default function StudentDashboard() {
             <Link to="/student/enroll" className="quick-action-card action-warning">
               <span className="qa-icon">🎓</span>
               <div className="qa-info">
-                <h4>Enroll in Subjects</h4>
-                <p>Register for current semester labs</p>
+                <h4>Enroll & Unenroll</h4>
+                <p>Register or unenroll from lab courses</p>
               </div>
             </Link>
             <Link to="/student/bookmarks" className="quick-action-card action-info">
@@ -367,6 +387,53 @@ export default function StudentDashboard() {
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* Enrolled Subjects & Unenrollment Section */}
+      <div className="dashboard-card" style={{ marginTop: 24 }}>
+        <div className="card-header-flex">
+          <div>
+            <h3>Your Enrolled Lab Subjects ({enrolledSubjects.length})</h3>
+            <p className="card-subtitle">Active courses — you can unenroll at any time</p>
+          </div>
+          <Link to="/student/enroll" className="card-action-link">+ Manage / Enroll More →</Link>
+        </div>
+
+        {enrolledSubjects.length === 0 ? (
+          <div className="empty-feed-state" style={{ padding: '24px 0' }}>
+            <span>🎓</span>
+            <p>You are not currently enrolled in any subjects.</p>
+            <Link to="/student/enroll" className="btn btn-primary btn-sm" style={{ marginTop: 8 }}>
+              Browse Available Subjects
+            </Link>
+          </div>
+        ) : (
+          <div className="experiments-grid" style={{ marginTop: 16 }}>
+            {enrolledSubjects.map((s) => (
+              <div key={s.id} className="experiment-card">
+                <div className="card-top">
+                  <div className="exp-number">{s.courseCode}</div>
+                  <h4>{s.subjectName}</h4>
+                  <div className="exp-meta">
+                    <span>🏫 {s.department}</span>
+                    <span>📅 Year {s.year}, Sem {s.semester}</span>
+                    {s.facultyName && <span>👨‍🏫 {s.facultyName}</span>}
+                  </div>
+                </div>
+                <div className="card-bottom">
+                  <span className="badge badge-success">✓ Enrolled</span>
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleUnenroll(s.id, s.subjectName)}
+                  >
+                    ✕ Unenroll
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

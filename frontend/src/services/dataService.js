@@ -53,6 +53,7 @@ export const attendanceService = {
   mark: (data) => API.post('/attendance', data),
   getStudentAttendance: () => API.get('/attendance/student'),
   getStudentSummary: () => API.get('/attendance/student/summary'),
+  getForFaculty: () => API.get('/attendance/faculty'),
   getBySubject: (subjectId) => API.get(`/attendance/subject/${subjectId}`),
   update: (id, data) => API.put(`/attendance/${id}`, data),
 };

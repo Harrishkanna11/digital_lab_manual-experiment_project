@@ -10,8 +10,8 @@ export default function Login() {
   const roleParam = searchParams.get('role');
 
   const [form, setForm] = useState({
-    email: roleParam === 'faculty' ? 'faculty@digitallab.edu' : 'student@digitallab.edu',
-    password: 'password123'
+    email: '',
+    password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -20,44 +20,25 @@ export default function Login() {
   useEffect(() => {
     if (roleParam === 'faculty') {
       setActiveTab('FACULTY');
-      setForm({ email: 'faculty@digitallab.edu', password: 'password123' });
     } else if (roleParam === 'student') {
       setActiveTab('STUDENT');
-      setForm({ email: 'student@digitallab.edu', password: 'password123' });
     }
   }, [roleParam]);
 
   const handleTabSwitch = (role) => {
     setActiveTab(role);
-    if (role === 'STUDENT') {
-      setForm({ email: 'student@digitallab.edu', password: 'password123' });
-    } else {
-      setForm({ email: 'faculty@digitallab.edu', password: 'password123' });
-    }
-  };
-
-  const handleQuickLogin = async (email, password) => {
-    setLoading(true);
-    try {
-      const user = await login({ email, password });
-      toast.success(`Welcome back, ${user.fullName || user.email}!`);
-      navigate(user.role === 'STUDENT' ? '/student/dashboard' : '/faculty/dashboard');
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Quick login failed. Check backend connection.');
-    } finally {
-      setLoading(false);
-    }
+    setForm({ email: '', password: '' });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const user = await login(form);
-      toast.success(`Welcome back, ${user.fullName || user.email}!`);
+      const user = await login(form, activeTab);
+      toast.success(`Welcome back, ${user.fullName || (user.role === 'STUDENT' ? 'Student' : 'Faculty')}!`);
       navigate(user.role === 'STUDENT' ? '/student/dashboard' : '/faculty/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Invalid email or password');
+      toast.error(err.message || err.response?.data?.message || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -91,49 +72,20 @@ export default function Login() {
           </button>
         </div>
 
-        {/* Quick 1-Click Demo Login Box */}
-        <div className="demo-credentials-box">
-          <div className="demo-header">
-            <span className="demo-pill">⚡ 1-Click Demo Access</span>
-            <span className="demo-hint">No typing required</span>
-          </div>
-          <div className="demo-buttons-row">
-            <button
-              type="button"
-              className={`demo-btn ${activeTab === 'STUDENT' ? 'demo-btn-active' : ''}`}
-              onClick={() => handleQuickLogin('student@digitallab.edu', 'password123')}
-              disabled={loading}
-            >
-              <span className="demo-btn-role">Student</span>
-              <span className="demo-btn-name">Ada Lovelace</span>
-            </button>
-            <button
-              type="button"
-              className={`demo-btn ${activeTab === 'FACULTY' ? 'demo-btn-active' : ''}`}
-              onClick={() => handleQuickLogin('faculty@digitallab.edu', 'password123')}
-              disabled={loading}
-            >
-              <span className="demo-btn-role">Faculty</span>
-              <span className="demo-btn-name">Dr. Alan Turing</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="auth-divider">
-          <span>or sign in manually</span>
-        </div>
-
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit} className="auth-form" autoComplete="off">
           <div className="form-group">
-            <label>Email Address</label>
+            <label htmlFor="login-email">Email Address</label>
             <div className="input-with-icon">
               <span className="input-icon">✉️</span>
               <input
                 type="email"
+                id="login-email"
+                name="login-email"
                 className="form-control"
                 placeholder="e.g. user@digitallab.edu"
                 value={form.email}
                 onChange={e => setForm({...form, email: e.target.value})}
+                autoComplete="off"
                 required
               />
             </div>
@@ -141,7 +93,7 @@ export default function Login() {
 
           <div className="form-group">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label>Password</label>
+              <label htmlFor="login-password">Password</label>
               <button
                 type="button"
                 className="toggle-password-btn"
@@ -154,10 +106,13 @@ export default function Login() {
               <span className="input-icon">🔒</span>
               <input
                 type={showPassword ? 'text' : 'password'}
+                id="login-password"
+                name="login-password"
                 className="form-control"
                 placeholder="Enter password"
                 value={form.password}
                 onChange={e => setForm({...form, password: e.target.value})}
+                autoComplete="new-password"
                 required
               />
             </div>

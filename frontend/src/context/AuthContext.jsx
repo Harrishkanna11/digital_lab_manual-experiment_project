@@ -8,24 +8,42 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    if (token && savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      }
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    } catch {
+      // ignore
     }
-    setLoading(false);
+
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      authService.getCurrentUser()
+        .then(res => {
+          setUser(res.data);
+        })
+        .catch(() => {
+          sessionStorage.removeItem('token');
+          setUser(null);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  const login = async (credentials) => {
+  const login = async (credentials, expectedRole) => {
     const res = await authService.login(credentials);
     const userData = res.data;
-    localStorage.setItem('token', userData.token);
-    localStorage.setItem('user', JSON.stringify(userData));
+
+    if (expectedRole && userData.role !== expectedRole) {
+      const targetPortal = expectedRole === 'STUDENT' ? 'Student' : 'Faculty';
+      const actualRole = userData.role === 'STUDENT' ? 'Student' : 'Faculty';
+      throw new Error(`${actualRole} credentials cannot authenticate through the ${targetPortal} portal.`);
+    }
+
+    sessionStorage.setItem('token', userData.token);
     setUser(userData);
     return userData;
   };
@@ -33,8 +51,7 @@ export function AuthProvider({ children }) {
   const registerStudent = async (data) => {
     const res = await authService.registerStudent(data);
     const userData = res.data;
-    localStorage.setItem('token', userData.token);
-    localStorage.setItem('user', JSON.stringify(userData));
+    sessionStorage.setItem('token', userData.token);
     setUser(userData);
     return userData;
   };
@@ -42,15 +59,19 @@ export function AuthProvider({ children }) {
   const registerFaculty = async (data) => {
     const res = await authService.registerFaculty(data);
     const userData = res.data;
-    localStorage.setItem('token', userData.token);
-    localStorage.setItem('user', JSON.stringify(userData));
+    sessionStorage.setItem('token', userData.token);
     setUser(userData);
     return userData;
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    } catch {
+      // ignore
+    }
     setUser(null);
   };
 

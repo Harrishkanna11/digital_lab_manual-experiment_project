@@ -24,19 +24,26 @@ export default function SubjectEnrollment() {
     try { await subjectService.enroll(id); toast.success('Enrolled successfully!'); fetch(); } catch (err) { toast.error(err.response?.data?.message || 'Failed'); }
   };
 
-  const handleUnenroll = async (id) => {
-    try { await subjectService.unenroll(id); toast.success('Unenrolled'); fetch(); } catch { toast.error('Failed'); }
+  const handleUnenroll = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to unenroll from "${name}"?`)) return;
+    try {
+      await subjectService.unenroll(id);
+      toast.success(`Successfully unenrolled from ${name}`);
+      fetch();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to unenroll');
+    }
   };
 
   if (loading) return <div className="loading-spinner"><div className="spinner"></div></div>;
 
   return (
     <div>
-      <h2 style={{ marginBottom: 24, fontWeight: 800 }}>🎓 Subject Enrollment</h2>
+      <h2 style={{ marginBottom: 24, fontWeight: 800 }}>🎓 Subject Enrollment & Unenrollment</h2>
 
       {enrolledSubjects.length > 0 && (
         <div style={{ marginBottom: 32 }}>
-          <h3 style={{ marginBottom: 12, fontSize: '1rem', fontWeight: 700 }}>Your Enrolled Subjects</h3>
+          <h3 style={{ marginBottom: 12, fontSize: '1rem', fontWeight: 700 }}>Your Enrolled Subjects ({enrolledSubjects.length})</h3>
           <div className="experiments-grid">
             {enrolledSubjects.map(s => (
               <div key={s.id} className="experiment-card">
@@ -46,11 +53,12 @@ export default function SubjectEnrollment() {
                   <div className="exp-meta">
                     <span>🏫 {s.department}</span>
                     <span>📅 Year {s.year}, Sem {s.semester}</span>
+                    {s.facultyName && <span>👨‍🏫 {s.facultyName}</span>}
                   </div>
                 </div>
                 <div className="card-bottom">
                   <span className="badge badge-success">✓ Enrolled</span>
-                  <button className="btn btn-danger btn-sm" onClick={() => handleUnenroll(s.id)}>Unenroll</button>
+                  <button className="btn btn-danger btn-sm" onClick={() => handleUnenroll(s.id, s.subjectName)}>✕ Unenroll</button>
                 </div>
               </div>
             ))}

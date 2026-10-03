@@ -36,7 +36,7 @@ export default function StudentLayout() {
     { path: '/student/marks', icon: '🏆', label: 'Marks & Feedback' },
     { path: '/student/journal', icon: '📓', label: 'My Lab Journal' },
     { path: '/student/bookmarks', icon: '🔖', label: 'Bookmarks' },
-    { path: '/student/enroll', icon: '🎓', label: 'Enroll Subjects' },
+    { path: '/student/enroll', icon: '🎓', label: 'Enroll / Unenroll' },
     { path: '/student/notifications', icon: '🔔', label: 'Notifications' },
     { path: '/student/profile', icon: '👤', label: 'Profile' },
   ];

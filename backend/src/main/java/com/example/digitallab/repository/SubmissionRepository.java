@@ -17,19 +17,30 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 
     @Query("""
         SELECT s FROM Submission s
-        WHERE s.experiment.subject.id IN (
-            SELECT sub.id FROM Subject sub WHERE sub.faculty.id = :facultyId
-        )
-        ORDER BY s.createdAt DESC
+        LEFT JOIN s.experiment e
+        LEFT JOIN e.subject sub
+        LEFT JOIN sub.faculty sf
+        LEFT JOIN e.createdBy ecb
+        WHERE (sf.id = :facultyId OR ecb.id = :facultyId)
+        ORDER BY s.submittedAt DESC, s.createdAt DESC
         """)
     List<Submission> findSubmissionsForFaculty(Long facultyId);
 
     @Query("""
         SELECT s FROM Submission s
-        WHERE s.experiment.subject.id IN (
-            SELECT sub.id FROM Subject sub WHERE sub.faculty.id = :facultyId
-        )
+        ORDER BY s.submittedAt DESC, s.createdAt DESC
+        """)
+    List<Submission> findAllSubmissions();
+
+    @Query("""
+        SELECT s FROM Submission s
+        LEFT JOIN s.experiment e
+        LEFT JOIN e.subject sub
+        LEFT JOIN sub.faculty sf
+        LEFT JOIN e.createdBy ecb
+        WHERE (sf.id = :facultyId OR ecb.id = :facultyId)
         AND s.status = :status
+        ORDER BY s.submittedAt DESC, s.createdAt DESC
         """)
     List<Submission> findSubmissionsForFacultyByStatus(Long facultyId, SubmissionStatus status);
 

@@ -71,7 +71,14 @@ public class SecurityConfig {
                 // Student-only endpoints
                 .requestMatchers("/api/students/me/**").hasRole("STUDENT")
                 .requestMatchers("/api/bookmarks/**").hasRole("STUDENT")
+                .requestMatchers(HttpMethod.POST, "/api/submissions").hasRole("STUDENT")
+                .requestMatchers("/api/submissions/student").hasRole("STUDENT")
+                .requestMatchers(HttpMethod.POST, "/api/subjects/*/enroll", "/api/subjects/**/enroll").hasRole("STUDENT")
+                .requestMatchers(HttpMethod.POST, "/api/subjects/*/unenroll", "/api/subjects/**/unenroll").hasRole("STUDENT")
+                .requestMatchers(HttpMethod.DELETE, "/api/subjects/*/unenroll", "/api/subjects/**/unenroll").hasRole("STUDENT")
                 // Faculty-only endpoints
+                .requestMatchers("/api/submissions/faculty").hasRole("FACULTY")
+                .requestMatchers(HttpMethod.PUT, "/api/submissions/*/review").hasRole("FACULTY")
                 .requestMatchers(HttpMethod.POST, "/api/experiments").hasRole("FACULTY")
                 .requestMatchers(HttpMethod.PUT, "/api/experiments/**").hasRole("FACULTY")
                 .requestMatchers(HttpMethod.DELETE, "/api/experiments/**").hasRole("FACULTY")
@@ -83,6 +90,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/lab-manuals/**").hasRole("FACULTY")
                 .requestMatchers(HttpMethod.POST, "/api/attendance/**").hasRole("FACULTY")
                 .requestMatchers(HttpMethod.PUT, "/api/attendance/**").hasRole("FACULTY")
+                .requestMatchers("/api/attendance/faculty").hasRole("FACULTY")
                 .requestMatchers(HttpMethod.POST, "/api/marks/**").hasRole("FACULTY")
                 .requestMatchers("/api/reports/**").hasRole("FACULTY")
                 // All other endpoints require authentication
