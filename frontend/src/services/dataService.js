@@ -17,6 +17,9 @@ export const subjectService = {
   delete: (id) => API.delete(`/subjects/${id}`),
   enroll: (subjectId) => API.post(`/subjects/${subjectId}/enroll`),
   unenroll: (subjectId) => API.delete(`/subjects/${subjectId}/unenroll`),
+  assignStudents: (subjectId, studentIds) => API.post(`/subjects/${subjectId}/assign-students`, { studentIds }),
+  unassignStudent: (subjectId, studentId) => API.delete(`/subjects/${subjectId}/assign/${studentId}`),
+  getSubjectStudents: (subjectId) => API.get(`/subjects/${subjectId}/students`),
 };
 
 export const labManualService = {
@@ -53,9 +56,12 @@ export const attendanceService = {
   mark: (data) => API.post('/attendance', data),
   getStudentAttendance: () => API.get('/attendance/student'),
   getStudentSummary: () => API.get('/attendance/student/summary'),
+  getStudentSubjectSummary: () => API.get('/attendance/student/subject-summary'),
   getForFaculty: () => API.get('/attendance/faculty'),
   getBySubject: (subjectId) => API.get(`/attendance/subject/${subjectId}`),
+  getBySubjectAndDate: (subjectId, date) => API.get(`/attendance/subject/${subjectId}/date/${date}`),
   update: (id, data) => API.put(`/attendance/${id}`, data),
+  markBulk: (records) => Promise.all(records.map(r => API.post('/attendance', r))),
 };
 
 export const markService = {
@@ -68,9 +74,11 @@ export const markService = {
 export const studentService = {
   getAll: () => API.get('/students'),
   getById: (id) => API.get(`/students/${id}`),
+  getBySubject: (subjectId) => API.get(`/students/subject/${subjectId}`),
   getProfile: () => API.get('/students/me'),
   getDashboard: () => API.get('/students/me/dashboard'),
   getFacultyDashboard: () => API.get('/students/faculty/dashboard'),
+  delete: (id) => API.delete(`/students/${id}`),
 };
 
 export const notificationService = {

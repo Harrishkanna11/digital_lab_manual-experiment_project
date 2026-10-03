@@ -1,7 +1,31 @@
 package com.example.digitallab.config;
 
-import com.example.digitallab.entity.*;
-import com.example.digitallab.repository.*;
+import com.example.digitallab.entity.Attendance;
+import com.example.digitallab.entity.AttendanceStatus;
+import com.example.digitallab.entity.Difficulty;
+import com.example.digitallab.entity.Experiment;
+import com.example.digitallab.entity.Faculty;
+import com.example.digitallab.entity.LabManual;
+import com.example.digitallab.entity.Mark;
+import com.example.digitallab.entity.Notification;
+import com.example.digitallab.entity.Role;
+import com.example.digitallab.entity.Student;
+import com.example.digitallab.entity.StudentSubject;
+import com.example.digitallab.entity.Subject;
+import com.example.digitallab.entity.Submission;
+import com.example.digitallab.entity.SubmissionStatus;
+import com.example.digitallab.entity.User;
+import com.example.digitallab.repository.AttendanceRepository;
+import com.example.digitallab.repository.ExperimentRepository;
+import com.example.digitallab.repository.FacultyRepository;
+import com.example.digitallab.repository.LabManualRepository;
+import com.example.digitallab.repository.MarkRepository;
+import com.example.digitallab.repository.NotificationRepository;
+import com.example.digitallab.repository.StudentRepository;
+import com.example.digitallab.repository.StudentSubjectRepository;
+import com.example.digitallab.repository.SubjectRepository;
+import com.example.digitallab.repository.SubmissionRepository;
+import com.example.digitallab.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -180,7 +204,7 @@ public class DataInitializer implements CommandLineRunner {
                 .published(true)
                 .publishedAt(LocalDateTime.now())
                 .build();
-        exp2 = experimentRepository.save(exp2);
+        experimentRepository.save(exp2);
 
         Experiment exp3 = Experiment.builder()
                 .experimentNumber(1)
@@ -203,7 +227,7 @@ public class DataInitializer implements CommandLineRunner {
                 .published(true)
                 .publishedAt(LocalDateTime.now())
                 .build();
-        exp3 = experimentRepository.save(exp3);
+        experimentRepository.save(exp3);
 
         // 7. Create a Sample Approved Submission for Exp 1
         Submission submission = Submission.builder()

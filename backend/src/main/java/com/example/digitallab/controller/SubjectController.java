@@ -70,6 +70,31 @@ public class SubjectController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{subjectId}/assign-students")
+    @PreAuthorize("hasRole('FACULTY')")
+    public ResponseEntity<List<StudentResponse>> assignStudents(
+            @PathVariable Long subjectId,
+            @RequestBody AssignStudentsRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        subjectService.assignStudents(subjectId, request.getStudentIds(), userDetails.getUsername());
+        return ResponseEntity.ok(studentService.getStudentsBySubject(subjectId));
+    }
+
+    @DeleteMapping("/{subjectId}/assign/{studentId}")
+    @PreAuthorize("hasRole('FACULTY')")
+    public ResponseEntity<Void> unassignStudent(
+            @PathVariable Long subjectId,
+            @PathVariable Long studentId) {
+        subjectService.unassignStudent(subjectId, studentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{subjectId}/students")
+    @PreAuthorize("hasRole('FACULTY')")
+    public ResponseEntity<List<StudentResponse>> getSubjectStudents(@PathVariable Long subjectId) {
+        return ResponseEntity.ok(studentService.getStudentsBySubject(subjectId));
+    }
+
     @PostMapping("/{subjectId}/enroll")
     @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<Void> enroll(

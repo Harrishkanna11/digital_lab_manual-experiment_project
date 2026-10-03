@@ -1,9 +1,22 @@
 package com.example.digitallab.service;
 
-import com.example.digitallab.dto.*;
-import com.example.digitallab.entity.*;
-import com.example.digitallab.exception.*;
-import com.example.digitallab.repository.*;
+import com.example.digitallab.dto.DashboardStats;
+import com.example.digitallab.dto.StudentResponse;
+import com.example.digitallab.entity.AttendanceStatus;
+import com.example.digitallab.entity.Student;
+import com.example.digitallab.entity.StudentSubject;
+import com.example.digitallab.entity.Subject;
+import com.example.digitallab.entity.User;
+import com.example.digitallab.exception.DuplicateResourceException;
+import com.example.digitallab.exception.ResourceNotFoundException;
+import com.example.digitallab.repository.AttendanceRepository;
+import com.example.digitallab.repository.ExperimentRepository;
+import com.example.digitallab.repository.MarkRepository;
+import com.example.digitallab.repository.StudentRepository;
+import com.example.digitallab.repository.StudentSubjectRepository;
+import com.example.digitallab.repository.SubjectRepository;
+import com.example.digitallab.repository.SubmissionRepository;
+import com.example.digitallab.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +40,14 @@ public class StudentService {
     @Transactional(readOnly = true)
     public List<StudentResponse> getAllStudents() {
         return studentRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<StudentResponse> getStudentsBySubject(Long subjectId) {
+        List<StudentSubject> enrollments = studentSubjectRepository.findBySubjectId(subjectId);
+        return enrollments.stream()
+                .map(ss -> toResponse(ss.getStudent()))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -140,5 +161,16 @@ public class StudentService {
                 .attendancePercentage(Math.round(attPct * 100.0) / 100.0)
                 .averageMarks(avgMarks != null ? Math.round(avgMarks * 100.0) / 100.0 : 0)
                 .build();
+    }
+
+    @Transactional
+    public void deleteStudent(Long id) {
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student", id));
+        User user = student.getUser();
+        studentRepository.delete(student);
+        if (user != null) {
+            userRepository.delete(user);
+        }
     }
 }

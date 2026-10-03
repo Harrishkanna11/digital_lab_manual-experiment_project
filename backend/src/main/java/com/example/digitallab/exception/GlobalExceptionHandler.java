@@ -46,7 +46,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(
             BadCredentialsException ex, HttpServletRequest request) {
-        return buildResponse(HttpStatus.UNAUTHORIZED, "Invalid email or password", request.getRequestURI());
+        String msg = (ex.getMessage() != null && !ex.getMessage().isBlank()) ? ex.getMessage() : "Invalid email ID or password";
+        return buildResponse(HttpStatus.UNAUTHORIZED, msg, request.getRequestURI());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

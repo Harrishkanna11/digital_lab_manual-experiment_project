@@ -41,10 +41,25 @@ public class AttendanceController {
         return ResponseEntity.ok(attendanceService.getStudentSummary(userDetails.getUsername()));
     }
 
+    @GetMapping("/student/subject-summary")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<List<AttendanceService.SubjectAttendanceSummary>> getStudentSubjectSummary(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(attendanceService.getStudentAttendanceBySubject(userDetails.getUsername()));
+    }
+
     @GetMapping("/subject/{subjectId}")
     @PreAuthorize("hasRole('FACULTY')")
     public ResponseEntity<List<AttendanceResponse>> getBySubject(@PathVariable Long subjectId) {
         return ResponseEntity.ok(attendanceService.getBySubject(subjectId));
+    }
+
+    @GetMapping("/subject/{subjectId}/date/{date}")
+    @PreAuthorize("hasRole('FACULTY')")
+    public ResponseEntity<List<AttendanceResponse>> getBySubjectAndDate(
+            @PathVariable Long subjectId,
+            @PathVariable @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date) {
+        return ResponseEntity.ok(attendanceService.getBySubjectAndDate(subjectId, date));
     }
 
     @GetMapping("/faculty")

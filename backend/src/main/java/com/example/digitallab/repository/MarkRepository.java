@@ -3,12 +3,10 @@ package com.example.digitallab.repository;
 import com.example.digitallab.entity.Mark;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface MarkRepository extends JpaRepository<Mark, Long> {
     List<Mark> findByStudentId(Long studentId);
     List<Mark> findByExperimentId(Long experimentId);

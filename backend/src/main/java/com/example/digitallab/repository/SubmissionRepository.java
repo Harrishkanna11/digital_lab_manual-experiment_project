@@ -4,12 +4,10 @@ import com.example.digitallab.entity.Submission;
 import com.example.digitallab.entity.SubmissionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     List<Submission> findByStudentId(Long studentId);
     Optional<Submission> findByStudentIdAndExperimentId(Long studentId, Long experimentId);

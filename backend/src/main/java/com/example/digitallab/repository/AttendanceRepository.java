@@ -4,11 +4,9 @@ import com.example.digitallab.entity.Attendance;
 import com.example.digitallab.entity.AttendanceStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findByStudentId(Long studentId);
     List<Attendance> findByStudentIdAndSubjectId(Long studentId, Long subjectId);
@@ -40,4 +38,11 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
         WHERE a.student.id = :studentId AND a.subject.id = :subjectId AND a.status = :status
         """)
     long countByStudentIdAndSubjectIdAndStatus(Long studentId, Long subjectId, AttendanceStatus status);
+
+    @Query("""
+        SELECT a FROM Attendance a
+        WHERE a.subject.id = :subjectId AND a.date = :date
+        ORDER BY a.student.user.fullName ASC
+        """)
+    List<Attendance> findBySubjectIdAndDate(Long subjectId, java.time.LocalDate date);
 }

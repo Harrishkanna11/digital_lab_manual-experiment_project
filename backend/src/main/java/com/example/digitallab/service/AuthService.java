@@ -1,12 +1,22 @@
 package com.example.digitallab.service;
 
-import com.example.digitallab.dto.*;
-import com.example.digitallab.entity.*;
-import com.example.digitallab.exception.*;
-import com.example.digitallab.repository.*;
+import com.example.digitallab.dto.AuthResponse;
+import com.example.digitallab.dto.FacultyRegisterRequest;
+import com.example.digitallab.dto.LoginRequest;
+import com.example.digitallab.dto.StudentRegisterRequest;
+import com.example.digitallab.entity.Faculty;
+import com.example.digitallab.entity.Role;
+import com.example.digitallab.entity.Student;
+import com.example.digitallab.entity.User;
+import com.example.digitallab.exception.DuplicateResourceException;
+import com.example.digitallab.exception.ResourceNotFoundException;
+import com.example.digitallab.repository.FacultyRepository;
+import com.example.digitallab.repository.StudentRepository;
+import com.example.digitallab.repository.UserRepository;
 import com.example.digitallab.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,27 +36,30 @@ public class AuthService {
 
     @Transactional
     public AuthResponse registerStudent(StudentRegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("Email already registered: " + request.getEmail());
+        String normalizedEmail = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : "";
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new DuplicateResourceException("Email already registered: " + request.getEmail().trim());
         }
-        if (studentRepository.existsByRegisterNumber(request.getRegisterNumber())) {
-            throw new DuplicateResourceException("Register number already exists: " + request.getRegisterNumber());
+        String cleanRegNo = request.getRegisterNumber() != null ? request.getRegisterNumber().trim() : "";
+        if (studentRepository.existsByRegisterNumber(cleanRegNo)) {
+            throw new DuplicateResourceException("Register number already exists: " + cleanRegNo);
         }
 
         User user = User.builder()
-                .email(request.getEmail())
+                .email(normalizedEmail)
                 .password(passwordEncoder.encode(request.getPassword()))
-                .fullName(request.getFullName())
+                .fullName(request.getFullName() != null ? request.getFullName().trim() : "")
                 .role(Role.STUDENT)
-                .department(request.getDepartment())
+                .department(request.getDepartment() != null ? request.getDepartment().trim() : "")
+                .active(true)
                 .build();
         user = userRepository.save(user);
 
         Student student = Student.builder()
                 .user(user)
-                .registerNumber(request.getRegisterNumber())
+                .registerNumber(cleanRegNo)
                 .year(request.getYear())
-                .section(request.getSection())
+                .section(request.getSection() != null ? request.getSection().trim() : "")
                 .build();
         studentRepository.save(student);
 
@@ -63,26 +76,29 @@ public class AuthService {
 
     @Transactional
     public AuthResponse registerFaculty(FacultyRegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("Email already registered: " + request.getEmail());
+        String normalizedEmail = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : "";
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new DuplicateResourceException("Email already registered: " + request.getEmail().trim());
         }
-        if (facultyRepository.existsByFacultyId(request.getFacultyId())) {
-            throw new DuplicateResourceException("Faculty ID already exists: " + request.getFacultyId());
+        String cleanFacultyId = request.getFacultyId() != null ? request.getFacultyId().trim() : "";
+        if (facultyRepository.existsByFacultyId(cleanFacultyId)) {
+            throw new DuplicateResourceException("Faculty ID already exists: " + cleanFacultyId);
         }
 
         User user = User.builder()
-                .email(request.getEmail())
+                .email(normalizedEmail)
                 .password(passwordEncoder.encode(request.getPassword()))
-                .fullName(request.getFullName())
+                .fullName(request.getFullName() != null ? request.getFullName().trim() : "")
                 .role(Role.FACULTY)
-                .department(request.getDepartment())
+                .department(request.getDepartment() != null ? request.getDepartment().trim() : "")
+                .active(true)
                 .build();
         user = userRepository.save(user);
 
         Faculty faculty = Faculty.builder()
                 .user(user)
-                .facultyId(request.getFacultyId())
-                .designation(request.getDesignation())
+                .facultyId(cleanFacultyId)
+                .designation(request.getDesignation() != null ? request.getDesignation().trim() : "")
                 .build();
         facultyRepository.save(faculty);
 
@@ -98,12 +114,24 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        String normalizedEmail = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : "";
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findByEmailIgnoreCase(normalizedEmail)
+                .orElseThrow(() -> new BadCredentialsException("Invalid email ID or password"));
+
+        if (request.getRole() != null && !request.getRole().isBlank()) {
+            if (!user.getRole().name().equalsIgnoreCase(request.getRole().trim())) {
+                String portalName = request.getRole().equalsIgnoreCase("STUDENT") ? "Student" : "Faculty";
+                String userRole = user.getRole() == Role.STUDENT ? "Student" : "Faculty";
+                throw new BadCredentialsException(
+                        userRole + " credentials cannot authenticate through the " + portalName + " portal."
+                );
+            }
+        }
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getEmail(), request.getPassword())
+        );
 
         String token = tokenProvider.generateToken(authentication);
         return AuthResponse.builder()
@@ -117,7 +145,8 @@ public class AuthService {
     }
 
     public AuthResponse getCurrentUser(String email) {
-        User user = userRepository.findByEmail(email)
+        String cleanEmail = email != null ? email.trim() : "";
+        User user = userRepository.findByEmailIgnoreCase(cleanEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return AuthResponse.builder()
                 .email(user.getEmail())

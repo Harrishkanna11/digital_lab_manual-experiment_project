@@ -179,18 +179,22 @@ public class SubmissionService {
         String notifType;
         String notifTitle;
         String notifMsg;
-        if (request.getStatus() == SubmissionStatus.APPROVED) {
-            notifType = "SUBMISSION_APPROVED";
-            notifTitle = "Submission Approved";
-            notifMsg = "Your submission for " + savedSubmission.getExperiment().getTitle() + " has been approved!";
-        } else if (request.getStatus() == SubmissionStatus.RESUBMIT) {
-            notifType = "SUBMISSION_RESUBMIT";
-            notifTitle = "Resubmission Requested";
-            notifMsg = "Resubmission requested for " + savedSubmission.getExperiment().getTitle() + (request.getFeedback() != null ? ". Feedback: " + request.getFeedback() : "");
-        } else {
-            notifType = "SUBMISSION_REJECTED";
-            notifTitle = "Submission Rejected";
-            notifMsg = "Your submission for " + savedSubmission.getExperiment().getTitle() + " has been rejected. Feedback: " + request.getFeedback();
+        switch (request.getStatus()) {
+            case APPROVED -> {
+                notifType = "SUBMISSION_APPROVED";
+                notifTitle = "Submission Approved";
+                notifMsg = "Your submission for " + savedSubmission.getExperiment().getTitle() + " has been approved!";
+            }
+            case RESUBMIT -> {
+                notifType = "SUBMISSION_RESUBMIT";
+                notifTitle = "Resubmission Requested";
+                notifMsg = "Resubmission requested for " + savedSubmission.getExperiment().getTitle() + (request.getFeedback() != null ? ". Feedback: " + request.getFeedback() : "");
+            }
+            default -> {
+                notifType = "SUBMISSION_REJECTED";
+                notifTitle = "Submission Rejected";
+                notifMsg = "Your submission for " + savedSubmission.getExperiment().getTitle() + " has been rejected. Feedback: " + request.getFeedback();
+            }
         }
 
         notificationService.createNotification(savedSubmission.getStudent(),
@@ -234,7 +238,7 @@ public class SubmissionService {
                 .studentRegisterNumber(s.getStudent() != null ? s.getStudent().getRegisterNumber() : "N/A")
                 .experimentId(s.getExperiment() != null ? s.getExperiment().getId() : null)
                 .experimentTitle(s.getExperiment() != null ? s.getExperiment().getTitle() : "Untitled Experiment")
-                .experimentNumber(s.getExperiment() != null ? s.getExperiment().getExperimentNumber() : 0)
+                .experimentNumber(s.getExperiment() != null ? s.getExperiment().getExperimentNumber() : null)
                 .subjectName(s.getExperiment() != null && s.getExperiment().getSubject() != null ? s.getExperiment().getSubject().getSubjectName() : "N/A")
                 .sourceCode(s.getSourceCode())
                 .observation(s.getObservation())

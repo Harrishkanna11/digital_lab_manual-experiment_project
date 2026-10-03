@@ -34,7 +34,12 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (credentials, expectedRole) => {
-    const res = await authService.login(credentials);
+    const payload = {
+      ...credentials,
+      email: credentials.email?.trim()?.toLowerCase(),
+      role: expectedRole
+    };
+    const res = await authService.login(payload);
     const userData = res.data;
 
     if (expectedRole && userData.role !== expectedRole) {
@@ -49,7 +54,14 @@ export function AuthProvider({ children }) {
   };
 
   const registerStudent = async (data) => {
-    const res = await authService.registerStudent(data);
+    const payload = {
+      ...data,
+      email: data.email?.trim()?.toLowerCase(),
+      fullName: data.fullName?.trim(),
+      registerNumber: data.registerNumber?.trim(),
+      section: data.section?.trim()
+    };
+    const res = await authService.registerStudent(payload);
     const userData = res.data;
     sessionStorage.setItem('token', userData.token);
     setUser(userData);
@@ -57,7 +69,14 @@ export function AuthProvider({ children }) {
   };
 
   const registerFaculty = async (data) => {
-    const res = await authService.registerFaculty(data);
+    const payload = {
+      ...data,
+      email: data.email?.trim()?.toLowerCase(),
+      fullName: data.fullName?.trim(),
+      facultyId: data.facultyId?.trim(),
+      designation: data.designation?.trim()
+    };
+    const res = await authService.registerFaculty(payload);
     const userData = res.data;
     sessionStorage.setItem('token', userData.token);
     setUser(userData);

@@ -20,6 +20,9 @@ yarn-debug.log*
 uploads/
 backend/uploads/
 scratch/
+data/
+backend/data/
+*.mv.db
 
 # IDE & Editor files
 .idea/

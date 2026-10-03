@@ -16,7 +16,7 @@ export default function SubmissionReview() {
       .then(res => {
         setSubmissions(res.data || []);
       })
-      .catch(err => {
+      .catch(() => {
         toast.error('Failed to load student submissions');
         setSubmissions([]);
       })
@@ -174,7 +174,7 @@ export default function SubmissionReview() {
 
       {/* Review & Details Modal */}
       {reviewModal && (
-        <div className="modal-backdrop" onClick={e => !submitting && setReviewModal(null)}>
+        <div className="modal-backdrop" onClick={() => !submitting && setReviewModal(null)}>
           <div className="modal-dialog modal-lg" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <div>

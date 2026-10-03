@@ -34,11 +34,15 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const user = await login(form, activeTab);
+      const payload = {
+        ...form,
+        email: form.email?.trim()
+      };
+      const user = await login(payload, activeTab);
       toast.success(`Welcome back, ${user.fullName || (user.role === 'STUDENT' ? 'Student' : 'Faculty')}!`);
       navigate(user.role === 'STUDENT' ? '/student/dashboard' : '/faculty/dashboard');
     } catch (err) {
-      toast.error(err.message || err.response?.data?.message || 'Invalid email or password');
+      toast.error(err.response?.data?.message || err.message || 'Invalid email ID or password');
     } finally {
       setLoading(false);
     }
@@ -86,6 +90,7 @@ export default function Login() {
                 value={form.email}
                 onChange={e => setForm({...form, email: e.target.value})}
                 autoComplete="off"
+                autoCapitalize="none"
                 required
               />
             </div>
