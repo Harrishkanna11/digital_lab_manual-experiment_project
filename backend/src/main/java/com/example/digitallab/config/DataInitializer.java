@@ -54,9 +54,16 @@ public class DataInitializer implements CommandLineRunner {
     private final NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @org.springframework.beans.factory.annotation.Value("${app.seed.demo-data:true}")
+    private boolean seedDemoData;
+
     @Override
     @Transactional
     public void run(String... args) {
+        if (!seedDemoData) {
+            log.info("Demo data seeding is disabled (app.seed.demo-data=false). Skipping.");
+            return;
+        }
         if (userRepository.count() > 0) {
             log.info("Database already initialized, skipping seed data.");
             return;

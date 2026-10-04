@@ -1,0 +1,29 @@
+# Maven build output
+target/
+*.jar
+*.war
+
+# Local dev data files
+data/
+*.mv.db
+*.trace.db
+
+# Upload files (not part of source)
+uploads/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Git
+.git/

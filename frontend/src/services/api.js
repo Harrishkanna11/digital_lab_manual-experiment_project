@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// In production (Netlify), VITE_API_URL is set to the backend URL (e.g. https://your-backend.onrender.com).
+// In local development, VITE_API_URL is not set, so baseURL falls back to '/api',
+// which Vite proxies to http://localhost:8080 (see vite.config.js).
 const API = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api',
   headers: {
     'Content-Type': 'application/json',
   },
